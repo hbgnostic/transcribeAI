@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TranscribeAI - Audio Transcription & Summarization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --code-bg: #1e1e3f;
+            --success: #22c55e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><rect fill="rgba(255,255,255,0.1)" x="25" y="25" width="50" height="50" transform="rotate(45 50 50)"/></svg>');
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 5rem 0;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        section {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .step-container {
+            margin: 3rem 0;
+            position: relative;
+        }
+        
+        .step-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            background-color: rgba(99, 102, 241, 0.2);
+            transform: translateX(-50%);
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        .step:nth-child(odd) {
+            flex-direction: row-reverse;
+        }
+        
+        .step-content {
+            width: 45%;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step:nth-child(odd) .step-content {
+            text-align: right;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 1;
+        }
+        
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block code {
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            display: block;
+            white-space: pre-wrap;
+        }
+        
+        .code-language {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0 10px 0 10px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .alert.show {
+            opacity: 1;
+        }
+        
+        .results-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .result-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+        }
+        
+        .result-body {
+            padding: 1.5rem;
+        }
+        
+        .result-audio {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .transcript, .summary {
+            margin-top: 1rem;
+        }
+        
+        .transcript h4, .summary h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .transcript h4 i, .summary h4 i {
+            margin-right: 0.5rem;
+        }
+        
+        .transcript p, .summary p {
+            font-size: 0.9rem;
+            color: var(--dark);
+            background-color: rgba(99, 102, 241, 0.05);
+            padding: 1rem;
+            border-radius: 5px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .cta {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            padding: 5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><rect fill="rgba(255,255,255,0.1)" x="25" y="25" width="50" height="50" transform="rotate(45 50 50)"/></svg>');
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .footer-links a {
+            color: var(--gray);
+            margin: 0 1rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-links {
+            margin: 1.5rem 0;
+        }
+        
+        .social-links a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        @media (max-width: 768px) {
+            .step-container::before {
+                left: 30px;
+            }
+            
+            .step, .step:nth-child(odd) {
+                flex-direction: column;
+                padding-left: 60px;
+            }
+            
+            .step-number {
+                left: 30px;
+                transform: translateX(-50%);
+            }
+            
+            .step-content, .step:nth-child(odd) .step-content {
+                width: 100%;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="hero">
+                <h1>TranscribeAI</h1>
+                <p>An open-source tool that transcribes and summarizes audio files using advanced AI models. Convert spoken content into actionable insights in seconds.</p>
+                <a href="#get-started" class="btn">Get Started <i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/yourusername/transcribeai" class="btn btn-secondary"><i class="fab fa-github"></i> View on GitHub</a>
+            </div>
+        </div>
+    </header>
+    
+    <section id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Features</h2>
+                <p>What makes TranscribeAI different?</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h3>State-of-the-Art Transcription</h3>
+                    <p>Powered by OpenAI's Whisper, our tool accurately transcribes audio in multiple languages with impressive accuracy.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>AI-Powered Summarization</h3>
+                    <p>Leverage the power of GPT-4 to transform lengthy transcripts into concise, meaningful summaries.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>Simple Integration</h3>
+                    <p>Easy to use in Google Colab or locally. Designed to fit seamlessly into your existing workflow.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="get-started" class="bg-light">
+        <div class="container">
+            <div class="section-title">
+                <h2>How It Works</h2>
+                <p>Follow these simple steps to start transcribing and summarizing your audio files</p>
+            </div>
+            
+            <div class="step-container">
+                <div class="step">
+                    <div class="step-content">
+                        <h3>Install Required Packages</h3>
+                        <p>First, you'll need to install Whisper, OpenAI's Python client, and FFmpeg for audio processing.</p>
+                        
+                        <div class="code-block">
+                            <span class="code-language">Python</span>
+                            <code>!pip install git+https://github.com/openai/whisper.git
+!pip install openai
+!apt update && apt install -y ffmpeg</code>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-number">1</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-content">
+                        <h3>Upload Your Audio Files</h3>
+                        <p>Use Google Colab's file uploader to add your MP3 or WAV files to the session.</p>
+                        
+                        <div class="code-block">
+                            <span class="code-language">Python</span>
+                            <code>from google.colab import files
+uploaded = files.upload()</code>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-number">2</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-content">
+                        <h3>Transcribe with Whisper</h3>
+                        <p>Use OpenAI's Whisper model to convert the audio to text with high accuracy.</p>
+                        
+                        <div class="code-block">
+                            <span class="code-language">Python</span>
+                            <code>import whisper
+
+model = whisper.load_model("base", device="cpu")
+
+transcripts = {}
+
+for filename in uploaded.keys():
+    result = model.transcribe(filename)
+    transcripts[filename] = result["text"]</code>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-number">3</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-content">
+                        <h3>Summarize with GPT-4</h3>
+                        <p>Send the transcripts to OpenAI's GPT-4 API to generate concise, meaningful summaries.</p>
+                        
+                        <div class="code-block">
+                            <span class="code-language">Python</span>
+                            <code>import openai
+
+openai.api_key = "sk-..."  # Replace with your API key
+
+summaries = {}
+
+for filename, transcript in transcripts.items():
+    prompt = f"Please summarize the following transcription:\n\n{transcript}"
+    
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You're a helpful assistant that summarizes transcripts."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    summary = response.choices[0].message.content.strip()
+    summaries[filename] = summary</code>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-number">4</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-content">
+                        <h3>Save and Download Results</h3>
+                        <p>Generate text files with your summaries and download them to your local machine.</p>
+                        
+                        <div class="code-block">
+                            <span class="code-language">Python</span>
+                            <code>for filename, summary in summaries.items():
+    outname = filename.rsplit(".", 1)[0] + "_summary.txt"
+    with open(outname, "w") as f:
+        f.write(summary)
+    files.download(outname)</code>
+                            <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                    <div class="step-number">5</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="results">
+        <div class="container">
+            <div class="section-title">
+                <h2>Sample Results</h2>
+                <p>See how TranscribeAI transforms audio content into valuable text</p>
+            </div>
+            
+            <div class="results-showcase">
+                <div class="result-card">
+                    <div class="result-header">
+                        Sample 1: Team Meeting
+                    </div>
+                    <div class="result-body">
+                        <audio controls class="result-audio">
+                            <source src="#" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        
+                        <div class="transcript">
+                            <h4><i class="fas fa-file-alt"></i> Transcript</h4>
+                            <p>Alright team, thanks for joining today's product roadmap meeting. I wanted to review our Q3 priorities. First, we need to finalize the new user onboarding flow. Data shows we're losing too many users in the first week. Second, the payment integration issues need to be resolved – several customers reported failed transactions. Finally, we should start planning the mobile app redesign for next quarter. Any questions before we dive deeper into each item?</p>
+                        </div>
+                        
+                        <div class="summary">
+                            <h4><i class="fas fa-lightbulb"></i> Summary</h4>
+                            <p>Q3 priorities include: 1) Fixing the user onboarding flow to reduce early user churn, 2) Resolving payment integration issues causing transaction failures, and 3) Planning for the mobile app redesign scheduled for next quarter.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-header">
+                        Sample 2: Academic Lecture
+                    </div>
+                    <div class="result-body">
+                        <audio controls class="result-audio">
+                            <source src="#" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        
+                        <div class="transcript">
+                            <h4><i class="fas fa-file-alt"></i> Transcript</h4>
+                            <p>Today we're discussing climate change mitigation strategies. Current models show we need to reduce global emissions by at least 45% by 2030 to limit warming to 1.5°C. This requires a multi-faceted approach: transitioning to renewable energy sources, improving energy efficiency in buildings and transportation, implementing carbon capture technologies, and changing consumption patterns. The Paris Agreement provides a framework, but individual countries must strengthen their commitments. Recent studies show that current pledges are insufficient to meet the 1.5°C target.</p>
+                        </div>
+                        
+                        <div class="summary">
+                            <h4><i class="fas fa-lightbulb"></i> Summary</h4>
+                            <p>Climate change mitigation requires a 45% reduction in global emissions by 2030 to limit warming to 1.5°C. Key strategies include renewable energy transition, energy efficiency improvements, carbon capture, and consumption changes. Current Paris Agreement pledges are inadequate to meet temperature targets.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Try TranscribeAI?</h2>
+            <p>Transform your audio content into valuable insights today.</p>
+            <a href="https://github.com/yourusername/transcribeai" class="btn"><i class="fab fa-github"></i> Fork on GitHub</a>
+            <a href="https://colab.research.google.com/github/yourusername/transcribeai/blob/main/TranscribeAI.ipynb" class="btn btn-secondary"><i class="fab fa-google"></i> Open in Colab</a>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <h3>TranscribeAI</h3>
+            <p>An open-source tool for audio transcription and summarization</p>
+            
+            <div class="footer-links">
+                <a href="#">Home</a>
+                <a href="#features">Features</a>
+                <a href="#get-started">Get Started</a>
+                <a href="#results">Results</a>
+                <a href="https://github.com/yourusername/transcribeai">GitHub</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            
+            <p>&copy; 2025 TranscribeAI. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <div class="alert" id="copyAlert">Copied to clipboard!</div>
+    
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const codeBlock = btn.parentElement;
+                const code = codeBlock.querySelector('code').innerText;
+                
+                navigator.clipboard.writeText(code).then(() => {
+                    const alert = document.getElementById('copyAlert');
+                    alert.classList.add('show');
+                    
+                    setTimeout(() => {
+                        alert.classList.remove('show');
+                    }, 2000);
+                });
+            });
+        });
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
