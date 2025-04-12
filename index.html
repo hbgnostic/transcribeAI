@@ -15,6 +15,7 @@
             --gray: #94a3b8;
             --code-bg: #1e1e3f;
             --success: #22c55e;
+            --warning: #f97316;
         }
         
         * {
@@ -409,6 +410,44 @@
             background-color: var(--primary);
             transform: translateY(-3px);
         }
+
+        .info-box {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .info-box h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box h3 i {
+            margin-right: 0.5rem;
+        }
+        
+        .warning-box {
+            background-color: rgba(249, 115, 22, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .warning-box h3 {
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .warning-box h3 i {
+            margin-right: 0.5rem;
+        }
         
         @media (max-width: 768px) {
             .step-container::before {
@@ -439,7 +478,7 @@
                 <h1>TranscribeAI</h1>
                 <p>An open-source tool that transcribes and summarizes audio files using advanced AI models. Convert spoken content into actionable insights in seconds.</p>
                 <a href="#get-started" class="btn">Get Started <i class="fas fa-arrow-right"></i></a>
-                <a href="https://github.com/yourusername/transcribeai" class="btn btn-secondary"><i class="fab fa-github"></i> View on GitHub</a>
+                <a href="https://colab.research.google.com/REPLACE_WITH_YOUR_COLAB_LINK" class="btn btn-secondary"><i class="fab fa-google"></i> Try in Colab</a>
             </div>
         </div>
     </header>
@@ -465,7 +504,7 @@
                         <i class="fas fa-brain"></i>
                     </div>
                     <h3>AI-Powered Summarization</h3>
-                    <p>Leverage the power of GPT-4 to transform lengthy transcripts into concise, meaningful summaries.</p>
+                    <p>Leverage the power of GPT-4 to transform lengthy transcripts into concise, meaningful summaries that capture key points and themes.</p>
                 </div>
                 
                 <div class="feature-card">
@@ -473,8 +512,14 @@
                         <i class="fas fa-laptop-code"></i>
                     </div>
                     <h3>Simple Integration</h3>
-                    <p>Easy to use in Google Colab or locally. Designed to fit seamlessly into your existing workflow.</p>
+                    <p>Easy to use in Google Colab without installation. Just click the "Try in Colab" button to get started instantly.</p>
                 </div>
+            </div>
+
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> Ready-to-Use Notebook</h3>
+                <p>We've created a ready-to-use Google Colab notebook that you can run immediately without any setup. Just click the "Try in Colab" button above to open the notebook, then follow the instructions to upload your audio files and get started.</p>
+                <p>You'll need your own OpenAI API key to use the summarization feature, but everything else works out of the box!</p>
             </div>
         </div>
     </section>
@@ -511,7 +556,12 @@
                         <div class="code-block">
                             <span class="code-language">Python</span>
                             <code>from google.colab import files
-uploaded = files.upload()</code>
+uploaded = files.upload()
+
+# This will display information about uploaded files
+print("Files uploaded:")
+for filename in uploaded.keys():
+    print(f" - {filename} ({round(len(uploaded[filename])/1024/1024, 2)} MB)")</code>
                             <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
                         </div>
                     </div>
@@ -526,14 +576,31 @@ uploaded = files.upload()</code>
                         <div class="code-block">
                             <span class="code-language">Python</span>
                             <code>import whisper
+import time
 
-model = whisper.load_model("base", device="cpu")
+# Load the Whisper model - options include "tiny", "base", "small", "medium", "large"
+model = whisper.load_model("base", device="cpu")  # Use "cuda" instead of "cpu" if you have a GPU
 
+# Dictionary to store transcriptions
 transcripts = {}
 
+# Process each uploaded file
 for filename in uploaded.keys():
+    print(f"Transcribing {filename}...")
+    start_time = time.time()
+    
+    # Perform the transcription
     result = model.transcribe(filename)
-    transcripts[filename] = result["text"]</code>
+    
+    # Store the result
+    transcripts[filename] = result["text"]
+    
+    # Print information
+    elapsed = time.time() - start_time
+    print(f"Completed in {elapsed:.2f} seconds")
+    print(f"Transcript preview: {result['text'][:150]}...\n")
+
+print("All transcriptions complete!")</code>
                             <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
                         </div>
                     </div>
@@ -545,27 +612,64 @@ for filename in uploaded.keys():
                         <h3>Summarize with GPT-4</h3>
                         <p>Send the transcripts to OpenAI's GPT-4 API to generate concise, meaningful summaries.</p>
                         
+                        <div class="warning-box">
+                            <h3><i class="fas fa-exclamation-triangle"></i> API Update Notice</h3>
+                            <p>This code uses the latest OpenAI API format (2023+). If you're following other tutorials, note that OpenAI's API structure has changed.</p>
+                        </div>
+                        
                         <div class="code-block">
                             <span class="code-language">Python</span>
-                            <code>import openai
+                            <code>from openai import OpenAI
+from getpass import getpass
 
-openai.api_key = "sk-..."  # Replace with your API key
+# Get API key securely (input will be hidden)
+api_key = getpass("Enter your OpenAI API key: ")
 
+# Initialize the client
+client = OpenAI(api_key=api_key)
+
+# Dictionary to store summaries
 summaries = {}
 
+# Process each transcript
 for filename, transcript in transcripts.items():
-    prompt = f"Please summarize the following transcription:\n\n{transcript}"
+    print(f"Summarizing {filename}...")
     
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
+    # Enhanced prompt with specific instructions for better summaries
+    prompt = f"""
+    Please provide a comprehensive and insightful summary of the following audio transcription.
+    
+    For this transcription, please:
+    1. Identify the main purpose/goal of the audio (meditation, instruction, etc.)
+    2. Outline the key techniques or methods mentioned
+    3. Capture the essential guidance or instructions provided
+    4. Note any important exercises or activities described
+    5. Include significant metaphors or concepts introduced
+    
+    Make the summary thorough yet concise, preserving the most valuable content.
+    
+    Transcription:
+    {transcript}
+    """
+    
+    # Call the OpenAI API with the improved prompt
+    response = client.chat.completions.create(
+        model="gpt-4",  # You can also use "gpt-3.5-turbo" for a faster, cheaper option
+        temperature=0.3,  # Lower temperature for more focused outputs
         messages=[
-            {"role": "system", "content": "You're a helpful assistant that summarizes transcripts."},
+            {"role": "system", "content": "You are an expert at analyzing and summarizing audio content, particularly guided meditations, coaching sessions, and therapeutic instructions. Provide thorough, accurate summaries that capture both the structure and essence of the content."},
             {"role": "user", "content": prompt}
         ]
     )
 
+    # Extract the summary
     summary = response.choices[0].message.content.strip()
-    summaries[filename] = summary</code>
+    summaries[filename] = summary
+    
+    # Print a preview
+    print(f"Summary preview: {summary[:150]}...\n")
+
+print("All summaries complete!")</code>
                             <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
                         </div>
                     </div>
@@ -579,16 +683,33 @@ for filename, transcript in transcripts.items():
                         
                         <div class="code-block">
                             <span class="code-language">Python</span>
-                            <code>for filename, summary in summaries.items():
+                            <code># Save and download summary files
+for filename, summary in summaries.items():
+    # Create output filename (replace extension with _summary.txt)
     outname = filename.rsplit(".", 1)[0] + "_summary.txt"
+    
+    # Write the summary to a file
     with open(outname, "w") as f:
+        f.write(f"SUMMARY OF {filename}:\n\n")
         f.write(summary)
-    files.download(outname)</code>
+    
+    # Download the file to the user's computer
+    from google.colab import files
+    files.download(outname)
+    
+    print(f"Saved and downloaded summary for {filename}")
+
+print("All summaries have been saved and downloaded!")</code>
                             <button class="copy-btn"><i class="fas fa-copy"></i> Copy</button>
                         </div>
                     </div>
                     <div class="step-number">5</div>
                 </div>
+            </div>
+            
+            <div class="info-box">
+                <h3><i class="fas fa-lightbulb"></i> Pro Tip</h3>
+                <p>Instead of manually copying and pasting these code snippets, you can simply click the "Try in Colab" button at the top of this page to access our ready-to-use notebook with all the code already set up for you!</p>
             </div>
         </div>
     </section>
@@ -603,7 +724,29 @@ for filename, transcript in transcripts.items():
             <div class="results-showcase">
                 <div class="result-card">
                     <div class="result-header">
-                        Sample 1: Team Meeting
+                        Sample 1: Guided Meditation
+                    </div>
+                    <div class="result-body">
+                        <audio controls class="result-audio">
+                            <source src="#" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        
+                        <div class="transcript">
+                            <h4><i class="fas fa-file-alt"></i> Transcript</h4>
+                            <p>On account of 3, I want you to take 3 deep breaths with me. And as you do so, you will feel yourself descending into a wonderful refreshing state of relaxation. 1, 2, 3 breathing and out. This session will address false memories and programs. Answer the following questions honestly. There is no need to revisit specific events. Simply answer the questions the best you can...</p>
+                        </div>
+                        
+                        <div class="summary">
+                            <h4><i class="fas fa-lightbulb"></i> Summary</h4>
+                            <p>This audio is a guided meditation focused on addressing false memories and programs. The session uses EFT (Emotional Freedom Technique) and Ho'oponopono to help listeners release feelings of unworthiness. The meditation guides participants through deep breathing, self-reflection questions about childhood experiences, tapping techniques on different meridian points, and affirmations designed to overcome victim mentality and foster self-acceptance. Key concepts include recognizing that parents' behavior reflected their limitations rather than the listener's worth, and embracing one's true identity as a unique being with specific life objectives.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-header">
+                        Sample 2: Team Meeting
                     </div>
                     <div class="result-body">
                         <audio controls class="result-audio">
@@ -618,29 +761,7 @@ for filename, transcript in transcripts.items():
                         
                         <div class="summary">
                             <h4><i class="fas fa-lightbulb"></i> Summary</h4>
-                            <p>Q3 priorities include: 1) Fixing the user onboarding flow to reduce early user churn, 2) Resolving payment integration issues causing transaction failures, and 3) Planning for the mobile app redesign scheduled for next quarter.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="result-card">
-                    <div class="result-header">
-                        Sample 2: Academic Lecture
-                    </div>
-                    <div class="result-body">
-                        <audio controls class="result-audio">
-                            <source src="#" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                        
-                        <div class="transcript">
-                            <h4><i class="fas fa-file-alt"></i> Transcript</h4>
-                            <p>Today we're discussing climate change mitigation strategies. Current models show we need to reduce global emissions by at least 45% by 2030 to limit warming to 1.5°C. This requires a multi-faceted approach: transitioning to renewable energy sources, improving energy efficiency in buildings and transportation, implementing carbon capture technologies, and changing consumption patterns. The Paris Agreement provides a framework, but individual countries must strengthen their commitments. Recent studies show that current pledges are insufficient to meet the 1.5°C target.</p>
-                        </div>
-                        
-                        <div class="summary">
-                            <h4><i class="fas fa-lightbulb"></i> Summary</h4>
-                            <p>Climate change mitigation requires a 45% reduction in global emissions by 2030 to limit warming to 1.5°C. Key strategies include renewable energy transition, energy efficiency improvements, carbon capture, and consumption changes. Current Paris Agreement pledges are inadequate to meet temperature targets.</p>
+                            <p>This team meeting outlines Q3 priorities for a product development team. The main focus areas are: 1) Finalizing a new user onboarding flow to address significant early-stage user drop-off within the first week, 2) Resolving payment integration issues that have caused failed transactions reported by multiple customers, and 3) Beginning preliminary planning for a mobile app redesign scheduled for implementation in Q4. The meeting sets the agenda before diving deeper into each priority item.</p>
                         </div>
                     </div>
                 </div>
@@ -652,8 +773,7 @@ for filename, transcript in transcripts.items():
         <div class="container">
             <h2>Ready to Try TranscribeAI?</h2>
             <p>Transform your audio content into valuable insights today.</p>
-            <a href="https://github.com/yourusername/transcribeai" class="btn"><i class="fab fa-github"></i> Fork on GitHub</a>
-            <a href="https://colab.research.google.com/github/yourusername/transcribeai/blob/main/TranscribeAI.ipynb" class="btn btn-secondary"><i class="fab fa-google"></i> Open in Colab</a>
+            <a href="https://colab.research.google.com/REPLACE_WITH_YOUR_COLAB_LINK" class="btn"><i class="fab fa-google"></i> Open in Colab</a>
         </div>
     </section>
     
@@ -667,7 +787,7 @@ for filename, transcript in transcripts.items():
                 <a href="#features">Features</a>
                 <a href="#get-started">Get Started</a>
                 <a href="#results">Results</a>
-                <a href="https://github.com/yourusername/transcribeai">GitHub</a>
+                <a href="https://colab.research.google.com/REPLACE_WITH_YOUR_COLAB_LINK">Try in Colab</a>
             </div>
             
             <div class="social-links">
