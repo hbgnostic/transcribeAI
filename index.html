@@ -475,17 +475,20 @@
     <header>
         <div class="container">
             <div class="hero">
-                <h1>TranscribeAI</h1>
+                <!-- Improved heading with better visibility -->
+                <h1 style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2); font-size: 3.8rem;">TranscribeAI</h1>
                 <p>An open-source tool that transcribes and summarizes audio files using advanced AI models. Convert spoken content into actionable insights in seconds.</p>
                 <a href="#get-started" class="btn">Get Started <i class="fas fa-arrow-right"></i></a>
-                <a href="https://colab.research.google.com/drive/16ge5lJQTFhpAuzI5Tfy0y8qEhplOSyoe?usp=sharing" class="btn btn-secondary"><i class="fab fa-google"></i> Try in Colab</a>
+                <!-- Improved secondary button styling for better visibility -->
+                <a href="https://colab.research.google.com/drive/16ge5lJQTFhpAuzI5Tfy0y8qEhplOSyoe?usp=sharing" class="btn btn-secondary" style="background-color: rgba(255,255,255,0.2); color: white; border-color: white;">
+                    <i class="fab fa-google"></i> Try in Colab
+                </a>
             </div>
         </div>
     </header>
-
-    <div style="height: 20px; background-color: var(--light);"></div>
-
-    <div style="max-width: 1200px; margin: 0 auto 2rem; padding: 1rem 2rem; background-color: white; border-radius: 10px; position: relative; z-index: 10; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border-left: 4px solid #6366f1;">
+    
+    <!-- Updated info bar with less spacing -->
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0.8rem 2rem; background-color: white; border-radius: 10px; position: relative; z-index: 10; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); border-left: 4px solid #6366f1; margin-top: -1rem; margin-bottom: 1rem;">
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div style="color: #6366f1; font-size: 1.5rem;">
                 <i class="fas fa-info-circle"></i>
@@ -493,7 +496,7 @@
             <div>
                 <p style="margin: 0; font-size: 0.9rem; color: #1e293b;">
                     <strong>Free transcription, pay-as-you-go summarization:</strong> 
-                    Transcription uses Whisper (free!). Summarization requires your OpenAI API key (0.03-0.06 per summary). 
+                    Transcription uses Whisper (free!). Summarization requires your OpenAI API key (~$0.03-0.06 per summary). 
                     <a href="#security" style="color: #4f46e5; text-decoration: underline;">Learn more about costs and security</a>
                 </p>
             </div>
@@ -636,11 +639,6 @@ print("All transcriptions complete!")</code>
                                 <li>Process shorter segments of audio for testing</li>
                                 <li>Add a length limit to your prompt to control token usage</li>
                             </ul>
-                        </div>
-                        
-                        <div class="warning-box">
-                            <h3><i class="fas fa-exclamation-triangle"></i> API Update Notice</h3>
-                            <p>This code uses the latest OpenAI API format (2023+). If you're following other tutorials, note that OpenAI's API structure has changed.</p>
                         </div>
                         
                         <div class="code-block">
