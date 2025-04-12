@@ -474,6 +474,28 @@
 <body>
     <header>
         <div class="container">
+            <div class="warning-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> Important Cost & Security Information</h3>
+                <p><strong>OpenAI API Costs:</strong> This tool uses the OpenAI API which requires your own API key and incurs charges based on usage:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Whisper transcription: ~$0.006 per minute of audio</li>
+                    <li>GPT-4 summarization: ~$0.03-0.06 per transcript (varies by length)</li>
+                    <li>A 30-minute audio file might cost $0.18-$0.36 total to process</li>
+                </ul>
+                <p><strong>API Key Security:</strong></p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Your OpenAI API key is entered using <code>getpass()</code> which hides it while typing</li>
+                    <li>Your key stays on your local Colab instance and is not stored or sent anywhere else</li>
+                    <li>The notebook does not save your API key in its history</li>
+                </ul>
+                <p><strong>Before Running:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Review the code to understand what actions it will perform</li>
+                    <li>Start with a short audio file for testing (1-2 minutes)</li>
+                    <li>Set up billing alerts in your OpenAI account</li>
+                    <li>Consider using GPT-3.5-Turbo instead of GPT-4 for lower costs</li>
+                </ul>
+            </div>
             <div class="hero">
                 <h1>TranscribeAI</h1>
                 <p>An open-source tool that transcribes and summarizes audio files using advanced AI models. Convert spoken content into actionable insights in seconds.</p>
@@ -611,6 +633,15 @@ print("All transcriptions complete!")</code>
                     <div class="step-content">
                         <h3>Summarize with GPT-4</h3>
                         <p>Send the transcripts to OpenAI's GPT-4 API to generate concise, meaningful summaries.</p>
+                        <div class="info-box">
+                            <h3><i class="fas fa-coins"></i> Cost Control Tips</h3>
+                            <p>To reduce costs when using this tool:</p>
+                            <ul style="margin-left: 20px;">
+                                <li>Replace <code>model="gpt-4"</code> with <code>model="gpt-3.5-turbo"</code> for ~10x lower cost</li>
+                                <li>Process shorter segments of audio for testing</li>
+                                <li>Add a length limit to your prompt to control token usage</li>
+                            </ul>
+                        </div>
                         
                         <div class="warning-box">
                             <h3><i class="fas fa-exclamation-triangle"></i> API Update Notice</h3>
@@ -774,6 +805,40 @@ print("All summaries have been saved and downloaded!")</code>
             <h2>Ready to Try TranscribeAI?</h2>
             <p>Transform your audio content into valuable insights today.</p>
             <a href="https://colab.research.google.com/drive/16ge5lJQTFhpAuzI5Tfy0y8qEhplOSyoe?usp=sharing" class="btn"><i class="fab fa-google"></i> Open in Colab</a>
+        </div>
+    </section>
+    <section id="security">
+        <div class="container">
+            <div class="section-title">
+                <h2>Security & Best Practices</h2>
+                <p>Responsible use of AI tools and API keys</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>API Key Management</h3>
+                    <p>Never share your OpenAI API key. This notebook uses <code>getpass()</code> to hide your key while typing. Your key is only used for the current session and is not stored in the notebook's history.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Cost Management</h3>
+                    <p>Set up billing alerts in your OpenAI account. You can also modify the code to use GPT-3.5-Turbo instead of GPT-4 for significantly lower costs. Start with small files to test before processing longer content.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Code Review</h3>
+                    <p>We encourage you to review the code in the notebook before running it. Understanding what each section does ensures you're comfortable with how the tool processes your files and uses your API key.</p>
+                </div>
+            </div>
         </div>
     </section>
     
